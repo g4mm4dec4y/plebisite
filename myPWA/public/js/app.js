@@ -7,6 +7,82 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+//Series of functions crucial to background processing
+
+function prefVote(ID) {
+  var tally_table_version = 1;
+  results_array = [];
+  var number_of_candidates = 0;
+  preterm_winners = [];
+  for (var i = 0; i < device_objects.length; i++) {
+    ;
+  }
+}
+
+function majorityVote(ID) {
+  tally_table = [];
+  results_array = [];
+  for (var i = 0; i < tally_table.count) {
+    if (row == 1) {
+      //tally_table(column name) += 1
+    }
+  }
+  //order columns ascending
+  // for column in id tally table
+      // add column name to results array, return results array
+}
+
+function generateCampaignKey() {
+
+}
+
+function generateVoterKey() {
+
+}
+
+function generateOrganiserKey() {
+
+}
+
+function identifyKey() {
+
+}
+
+function generateEmails(list, rel_campaign) {
+
+}
+
+function validateEmails(document) {
+
+}
+
+function createNewCampaign(name, candidates, voters, type, duration) {
+
+}
+
+function validateCampaignInfo(name, cands, email_doc, type) {
+
+}
+
+function getPageForOrganiser(key) {
+
+}
+
+function getCampaignForUser(key) {
+
+}
+
+//General page algorithm
+
+results_array = [];
+
+
+
+
+
+//Keeping past work below for reference
+
+/*
 //changing popup data to specific item clicked
 function appendData(obj_index) {
   fetch(`/devices`)
@@ -30,7 +106,6 @@ function appendData(obj_index) {
                 });
 }
 
-
 const open_buttons = document.getElementsByClassName('object')
 for (let btn of open_buttons) {
   //open popup on click
@@ -51,9 +126,6 @@ function popup_func(item_id) {
   document.getElementById('blur_body').style.filter = 'blur(5px)' 
 }
 
-
-
-/*
 //close popup
 const close_btn = document.getElementById('popup_close');
 //on click close popup
