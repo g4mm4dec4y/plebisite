@@ -22,7 +22,7 @@ function prefVote(ID) {
 function majorityVote(ID) {
   tally_table = [];
   results_array = [];
-  for (var i = 0; i < tally_table.count) {
+  for (var i = 0; i < tally_table.count; i++) {
     if (row == 1) {
       //tally_table(column name) += 1
     }
