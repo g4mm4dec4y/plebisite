@@ -51,6 +51,9 @@ function popup_func(item_id) {
   document.getElementById('blur_body').style.filter = 'blur(5px)' 
 }
 
+
+
+/*
 //close popup
 const close_btn = document.getElementById('popup_close');
 //on click close popup
@@ -145,3 +148,5 @@ document.getElementById("sort_popup").addEventListener("change", function() {
   // call relevant sort
   sort_by(selectedId);
 });
+
+*/
