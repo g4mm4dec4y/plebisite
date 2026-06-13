@@ -62,3 +62,55 @@ a:hover {
   background-color: transparent;
   text-decoration: underline;
 }
+
+.box {
+  background-color: #fefffb;
+  max-width: fit-content;
+  margin-inline: auto;
+  border-radius: 5px;
+  padding-top: 20px;
+  padding-right: 65px;
+  padding-bottom: 20px;
+  padding-left: 65px;
+  text-align: center;
+}
+
+#footer_text {
+  text-align: center;
+  padding-top: 50px;
+}
+
+#info_popup {
+  display: none;
+}
+
+#add_candidate {
+  width: 50px;
+  height: 50px;
+
+}
+
+#center_title {
+  text-align: center;
+}
+
+#interaction_field {
+  max-width: fit-content;
+  margin-inline: auto;
+}
+
+#form {
+  background-color: #fefffb;
+  max-width: fit-content;
+  margin-inline: auto;
+  border-radius: 5px;
+  padding-top: 20px;
+  padding-right: 65px;
+  padding-bottom: 20px;
+  padding-left: 65px;
+}
+
+#centered_logo {
+  max-width: fit-content;
+  margin-inline: auto;
+}
