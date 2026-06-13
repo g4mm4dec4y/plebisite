@@ -1,4 +1,11 @@
 body {
   background-color: #a2c8eb;
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  color: #0e1226;
+}
+
+.button {
+  background-color: #423e63;
+  color: #fefffb;
+  text-align: center;
 }

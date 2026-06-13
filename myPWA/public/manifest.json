@@ -1,10 +1,10 @@
     {
-        "name": "buzz of the 2000s",
-        "short_name": "bot00s",
+        "name": "plebisite",
+        "short_name": "plebi",
         "start_url": "./",
         "display": "standalone",
-        "background_color": "#767577",
-        "theme_color": "#767577",
+        "background_color": "#a2c8eb",
+        "theme_color": "#423e63",
         "orientation": "landscape-primary",
         "icons": [
         {
@@ -22,48 +22,8 @@
         ],
     "images" : [
         {
-        "src": "images/cybershot.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/gameboyadv.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/imacg3.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/imacg4.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/iphone2g.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/iphone3gs.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/logo.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/motorolav3.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/motorolav525.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/samsungphone.png",
-        "type": "image/png"
-        },
-        {
-        "src": "images/walkman.png",
-        "type": "image/png"
+        "src": "",
+        "type": ""
         }
     ]
     }
