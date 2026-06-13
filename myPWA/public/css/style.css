@@ -11,6 +11,10 @@ body {
   
 }
 
+main {
+  margin-top: 20px;
+}
+
 .button {
   background-color: #423e63;
   color: #fefffb;
@@ -113,4 +117,27 @@ a:hover {
 #centered_logo {
   max-width: fit-content;
   margin-inline: auto;
+}
+
+header {
+  display: flex;
+  height:3 00px;
+  
+}
+
+.logo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.new_cam {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#intro {
+  text-align: center;
 }
