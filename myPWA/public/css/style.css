@@ -9,3 +9,8 @@ body {
   color: #fefffb;
   text-align: center;
 }
+
+.logo {
+  max-width: 100px;
+  height: auto;
+}
