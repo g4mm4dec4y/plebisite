@@ -11,8 +11,7 @@
         <link rel="icon" type="image/x-icon" href="/images/icon.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     </head>
 
     <header>
@@ -21,14 +20,49 @@
         </div>
 
         <div class="new_cam">
-            <button class="create_campaign">Create a campaign</button>
+            <button id="create_campaign" class="button">Create a campaign</button>
         </div>
     </header>
 
     <body>
         <main>
-            <div class="thank_you_box">
-                <h1>Thank you for voting!</h1>
+
+            <div id="organiser_info">
+                <h1>For organisers:</h1>
+                <h2>Email document issues</h2>
+                <p>You need to ensure that the document containing emails is of a valid document type. Each email needs to be on a new line.</p>
+                
+                <h2>Viewing results</h2>
+                <p>To view your results, use the organiser key that was provided when you created the campaign. Enter this key into the field on the home page, and you will be taken to the results page.</p>
+                <p>If you try to view your results before the the time you chose has been reached, you will be greeted with a temporary placeholder. Check back after the campaign time has passed.</p>
+                <p>All campaign results and data is removed 48 hours after the campaign finishes. After this, your organiser key will no longer be valid. Please ensure you are quick to access your results.</p>
+            </div>
+
+            <br>
+
+            <div id="voter_info">
+                <h1>For voters:</h1>
+                <h2>My code isn't working</h2>
+                <p>If your code isn't working, this might mean the time to vote is up.</p>
+                <p>If not, please ensure you are copying and pasting your key accurately into the field.</p>
+
+                <h2>Am I anonymous?</h2>
+                <p>Yes. There are no identifiers linked to your vote. And, a machine processes all the votes, not a human.</p>
+            </div>
+
+            <br>
+
+            <div id="about">
+                <h1>About</h1>
+                <p>This is my final project for the NSW HSC Software Engineering course.</p>          
+            </div>
+
+            <br>
+
+            <div id="contact_info">
+                <h1>Further queries?</h1>
+                <p>Send an email to the dev...</p>
+                <p>gammadecay.dev@proton.me</p>
             </div>
 
         </main>
