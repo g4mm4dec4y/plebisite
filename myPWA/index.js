@@ -26,7 +26,25 @@ app.get("/get_identity", (req, res) => {
   });
 });
 
+// Querying to count candidates
+function getCandidates(callback) {
+  db.all("SELECT candidates FROM raw_data_table?;", [tableID], (err, rows) => {
+    if (err) {
+      console.error(err);
+      callback([]);
+      return;
+    }
+    callback(rows);
+  })
+};
 
+app.get("/get_candidates", (req, res) => {
+  let tableID = req.query.tableID;
+
+  getCandidates(tableID, (rows) => {
+    res.json(rows);
+  });
+});
 
 
 /*

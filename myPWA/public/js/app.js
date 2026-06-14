@@ -15,7 +15,22 @@ function prefVote(ID) {
   var number_of_candidates = 0;
   preterm_winners = [];
   //for column in raw data table add 1 to num candidates and add a column with cand name to tally table
-  for (var i = 0; i < device_objects.length; i++) {
+
+  fetch(`/get_candidates?key${encodeURIComponent(ID)}`)
+    .then(res => res.json())
+    .then(data => {
+      const num_of_candidates = data.length;
+      for (i=0; i < data.length; i++) {
+        let temp_cand = data[i];
+
+      }
+    })
+
+
+for (var i = 0; i < device_objects.length; i++)
+
+  
+  for (var i = 0 ; i < device_objects.length; i--) {
     ;
   }
   while (number_of_candidates != 2) {
@@ -47,6 +62,7 @@ function getRndInteger(min, max) {
 const { createHash } = require('crypto');
 const { type } = require('os');
 
+//Hashing a string through SHA256
 function hash(string) {
   return createHash('sha256').update(string).digest('hex');
 }
@@ -77,13 +93,20 @@ function identifyKey(entered_key) {
     .then(data => {
       const user_type = data.type;
     })
-    return user_type;
+    if (user_type == "organiser") {
+      return user_type;
+    } else if (user_type == "voter") {
+      return user_type;
+    } else {
+      return "invalid key"
+    };
 }
 
 function generateEmails(list, rel_campaign) {
   for (i=0, email in list, i++) {
       code = generateVoterKey();
       code_hashed = hash(code);
+
       // send email to email with link and code
       // add code_hashed, type=voter, campaign=rel_campaign to key table
 
@@ -93,12 +116,16 @@ function generateEmails(list, rel_campaign) {
 function validateEmails(document) {
   let invalid_emails = [];
   let valid_emails = [];
+
+
   while (line in document) {
     //email = remove whitespace of line
     //if email matches email regex
     // add email to valid emails
     //else add email to invalid emails
   };
+
+
   if (invalid_emails) {
     alert("There is an issue with your emails. No campign has been initiated. Please refer to the troubleshooting page and try again.");
     return false;
@@ -233,6 +260,7 @@ voteEnter.addEventListener('click', function() {
   // delete user key instances in keys table
 });
 
+
 /*
 IF campaign(status) == active AND campaign(duration) == 0
 IF selected_process of ID column in active_campaigns == "pref"
@@ -252,6 +280,8 @@ IF campaign(status) == pending AND campaign(duration) == 0:
 delete all relevant info wipe all data
 ENDIF
 */
+
+
 
 
 
