@@ -7,8 +7,8 @@ const app = express();
 
 //SQL functions
 
-function getIdentity(callback) {
-  db.all("SELECT * FROM key_table;", (err, rows) => {
+function getIdentity(key, callback) {
+  db.get("SELECT * FROM key_table WHERE code = ?", [key], (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -19,10 +19,15 @@ function getIdentity(callback) {
 };
 
 app.get("/get_identity", (req, res) => {
-  getIdentity((rows) => {
+  let key = req.query.key;
+  
+  getIdentity(key, (rows) => {
     res.json(rows);
   });
 });
+
+
+
 
 /*
 // Querying to get all objects

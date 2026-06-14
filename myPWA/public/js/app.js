@@ -45,6 +45,7 @@ function getRndInteger(min, max) {
 }
 
 const { createHash } = require('crypto');
+const { type } = require('os');
 
 function hash(string) {
   return createHash('sha256').update(string).digest('hex');
@@ -71,7 +72,12 @@ function generateOrganiserKey() {
 function identifyKey(entered_key) {
   let key_to_verify = entered_key;
   let entered_hash = hash(key_to_verify);
-  
+  fetch(`/get_identity?key${encodeURIComponent(key_to_verify)}`)
+    .then(res => res.json())
+    .then(data => {
+      const user_type = data.type;
+    })
+    return user_type;
 }
 
 function generateEmails(list, rel_campaign) {
@@ -246,6 +252,15 @@ IF campaign(status) == pending AND campaign(duration) == 0:
 delete all relevant info wipe all data
 ENDIF
 */
+
+
+
+
+
+
+
+
+
 
 
 
