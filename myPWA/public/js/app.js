@@ -32,28 +32,61 @@ function majorityVote(ID) {
       // add column name to results array, return results array
 }
 
-function generateCampaignKey() {
+//Get a string of numbers close to "true random"
+function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
 
+const { createHash } = require('crypto');
+
+function hash(string) {
+  return createHash('sha256').update(string).digest('hex');
+}
+
+
+function generateCampaignKey() {
+  let campaign_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
+  let campaign_string_hash = hash(campaign_initial_string);
+  return campaign_string_hash;
 }
 
 function generateVoterKey() {
-
+  let voter_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
+  let voter_string_hash = hash(campaign_initial_string);
+  return voter_string_hash;
 }
 
 function generateOrganiserKey() {
-
+  let organiser_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
+  return organiser_initial_string;
 }
 
-function identifyKey() {
-
+function identifyKey(entered_key) {
+  let key_to_verify = entered_key;
+  let entered_hash = hash(key_to_verify);
+  
 }
 
 function generateEmails(list, rel_campaign) {
+  for (i=0, email in list, i++) {
+      code = generateVoterKey();
+      code_hashed = hash(code);
 
+  }
 }
 
 function validateEmails(document) {
-
+  let invalid_emails = [];
+  let valid_emails = [];
+  while (line in document) {
+    
+  };
+  if (invalid_emails) {
+    alert("There is an issue with your emails. No campign has been initiated. Please refer to the troubleshooting page and try again.");
+    return false;
+  } else {
+    return valid_emails
+  };
 }
 
 function createNewCampaign(name, candidates, voters, type, duration) {
@@ -75,6 +108,8 @@ function getCampaignForUser(key) {
 //General page algorithm
 
 results_array = [];
+
+
 
 
 

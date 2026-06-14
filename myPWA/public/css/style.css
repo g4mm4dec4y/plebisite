@@ -141,3 +141,18 @@ header {
 #intro {
   text-align: center;
 }
+
+#create_campaign {
+  background-color: #423e63;
+  color: #fefffb;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  font-weight: 250;
+  border: none;
+  border-radius:3px;
+  padding-top: 5px;
+  padding-right: 7px;
+  padding-bottom: 5px;
+  padding-left: 7px;
+  cursor: pointer;
+}

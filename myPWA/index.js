@@ -7,6 +7,24 @@ const app = express();
 
 //SQL functions
 
+function getIdentity(callback) {
+  db.all("SELECT * FROM key_table;", (err, rows) => {
+    if (err) {
+      console.error(err);
+      callback([]);
+      return;
+    }
+    callback(rows);
+  })
+};
+
+app.get("/get_identity", (req, res) => {
+  getIdentity((rows) => {
+    res.json(rows);
+  });
+});
+
+/*
 // Querying to get all objects
 function getDevices(callback) {
   db.all("SELECT * FROM site_objects;", (err, rows) => {
@@ -104,6 +122,7 @@ app.get("/devices", (req, res) => {
 });
 
 
+*/
 
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(8000, () =>  {console.log("Server is running on Port 8000, visit http://localhost:8000/ or http://127.0.0.1:8000 to access your website");} );
