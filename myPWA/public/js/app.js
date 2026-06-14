@@ -22,18 +22,12 @@ function prefVote(ID) {
       const num_of_candidates = data.length;
       for (i=0; i < data.length; i++) {
         let temp_cand = data[i];
-
+        fetch(`/add_candidate_column?tableID${encodeURIComponent(ID)}candname${temp_cand}`)
       }
     })
 
-
-for (var i = 0; i < device_objects.length; i++)
-
-  
-  for (var i = 0 ; i < device_objects.length; i--) {
-    ;
-  }
   while (number_of_candidates != 2) {
+    
     //let total_votes = sum 
   }
 

@@ -26,6 +26,9 @@ app.get("/get_identity", (req, res) => {
   });
 });
 
+
+
+
 // Querying to count candidates
 function getCandidates(callback) {
   db.all("SELECT candidates FROM raw_data_table?;", [tableID], (err, rows) => {
@@ -45,6 +48,43 @@ app.get("/get_candidates", (req, res) => {
     res.json(rows);
   });
 });
+
+
+
+
+//Adding a column?
+function addColumn(table, name, callback) {
+  db.run("ALTER TABLE ? ADD COLUMN ? VARCHAR(50)", [tableID, candname])
+    if (err) {
+          if (err.message.includes("duplicate column name")) {
+              console.log("Column already exists.");
+          } else {
+              console.error("Error adding column:", err.message);
+          }
+      } else {
+          console.log("Column added successfully");
+      }
+}
+
+app.post("/add_candidate_column", (req, res) => {
+  let tableID = req.query.tableID;
+  let candname = req.query.candname;
+  addColumn(tableID, candname(rows))
+})
+
+
+function sumTotalVotes(ID, callback) {
+  db.get("SELECT SUM (votes) FROM tally_table?", [tableID], (err, rows) => {
+    if (err) {
+      console.error(err);
+      callback([]);
+      return;
+    }
+    callback(rows);
+  })
+}
+
+
 
 
 /*
