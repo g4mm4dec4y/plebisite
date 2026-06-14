@@ -90,19 +90,78 @@ function validateEmails(document) {
 }
 
 function createNewCampaign(name, candidates, voters, type, duration) {
-
+  let campaign_key = generateCampaignKey();
+  let camp_page = hash(campaign_key);
+  let organiser_key = generateOrganiserKey();
+  let organiser_key_hashed = hash(organiser_key);
+  // add to key table organiser_key_hashed, type=organiser, campaign=campaign_key
+  // add to active_campaigns database name, duration, camp_page=vote page
+  //randomise candidate array
+  /*
+    FOR candidate IN candidate array
+      add candidate name to candidate_div
+      add candidate_div to vote page
+	    add campaign_title to vote page
+    call generateEmails(voters, campaign_key)
+*/
+  generateEmails(voters, campaign_key)
+  return organiser_key;
 }
 
 function validateCampaignInfo(name, cands, email_doc, type) {
+  let error_info = "";
+  let validity_status = false;
+  function verify_status() {
+    if (event_name.length < 50 && event_name.length > 3) {
+      if (num_of_candidates >= 2) {
+        if (validateEmails(email_doc) == true) {
+          validity_status = true;
+        } else {
+            error_info = "Invalid emails";
+            validity_status = false;
+        };
+      } else {
+          error_info = "Invalid candidate amount";
+          validity_status = false;
+      };
+    } else {
+      error_info = "Invalid title";
+      validity_status = false;
+    };
+  }
 
+  if (validity_status == false) {
+    return error_info;
+  } else {
+    return "clear";
+  }
 }
 
 function getPageForOrganiser(key) {
+  let ref = hash(key);
+  /*
+    IF campaign(ref)_status == in_progress;
+	    clear organiser_page(ref)
+		  add waiting_room div
+    ELSEIF campaign(ref)_status == finished;
+	    clear organiser_page(ref)
+		  get campaign(results_array)
+			  FOR item IN results_array
+				  add name to candidate_div
+				  add preference to candidate_div
+				  add div to organiser_page(ref)
+	  ELSE
+		  clear organiser_page
+		  show error_div
+	  ENDIF
 
+  */
 }
 
 function getCampaignForUser(key) {
-
+    let ref = hash(key);
+    //let campaign = ref row active_campaign(vote page) cell
+    //redirect user to vote page (link/campaign)
 }
 
 //General page algorithm
@@ -110,8 +169,71 @@ function getCampaignForUser(key) {
 results_array = [];
 
 
+const submitCampInfo = document.getElementById("create_campaign_submit");
 
+submitCampInfo.addEventListener('click', function() {
+  //get event name, cand, emails, type, duration
+  let eventName = ""
+  let candidates = ""
+  let emails = ""
+  let type = ""
+  let duration = ""
+  status = validateCampaignInfo(eventName, candidates, emails, type, duration)
+  if (status == "clear") {
+    createNewCampaign(eventName, candidates, emails, type, duration)
+    //redirect to success page and return organiser code
+    //change the.. organiser page? to.. waiting room?
+  } else {
+    alert(status)
+  }
+});
 
+const codeEnter = document.getElementById("code_enter");
+
+codeEnter.addEventListener('click', function() {
+  //get field input
+  let code = "";
+  let user_check = identifyKey(code);
+  if (user_check == "voter") {
+    getCampaignForUser();
+  } else if (user_check == "organiser") {
+    getPageForOrganiser();
+  } else {
+    alert("Invalid code.");
+  }
+});
+
+const voteEnter = document.getElementById("vote_submit");
+
+voteEnter.addEventListener('click', function() {
+  // for candidate dive add value to candidate in raw results table
+  //for (i=0, , i++,) {
+  //  a='g';
+  //}
+  // redirect home
+  // display thanks for voting popup
+  // delete user key instances in keys table
+});
+
+/*
+IF campaign(status) == active AND campaign(duration) == 0
+IF selected_process of ID column in active_campaigns == "pref"
+	determined_results =  pref_vote(campaignID)
+	add to campaign(results) determined_results
+ELSEIF selected_process of ID column in active_campaigns == "most"
+	determined_results = call majority_vote(campaignID)
+	add to campaign(results) determined_results
+ELSE   raise error "Invalid vote system allocation"
+	break
+ENDIF
+campaign(status) == pending 
+campaign(duration) == 48h
+ENDIF
+
+IF campaign(status) == pending AND campaign(duration) == 0:
+delete all relevant info wipe all data
+ENDIF
+*/
 
 
 
