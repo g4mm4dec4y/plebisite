@@ -5,6 +5,9 @@ const path = require("path");
 const app = express();
 
 
+const { createHash } = require('crypto');
+const { type } = require('os');
+
 //SQL functions
 
 //Function to return the identity of a code
@@ -202,14 +205,14 @@ app.get("/get_omit_prefs", (req, res) => {
 
 //Select all rows for final comparison
 function getRows(callback) {
-  db.all{"SELECET *", (err, rows) => {
+  db.all("SELECT *", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
       return;
     };
     callback(rows);
-  }};
+  });
 };
 
 app.get("/get_rows", (req, res) => {

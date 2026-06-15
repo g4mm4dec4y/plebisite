@@ -156,7 +156,18 @@ function majorityVote() {
         let temp_cand = data[i];
         fetch(`/add_candidate_column?candname${encodeURIComponent(column_name)}`)
       }
+      for (i=0; i < num_of_candidates; i++) {
+        fetch(`/number_of_ones?candname${encodeURIComponent(data[i])}`)
+      }
     })
+  fetch(`/sort_tally_desc`)
+  .then (res => res.json())
+  .then (data => {
+    for (i=0; i < data.length; i++) {
+      results_array.push(data[i])
+    }
+  })
+  return results_array
 }
 
 //Get a string of numbers close to "true random"
@@ -164,15 +175,13 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
-const { createHash } = require('crypto');
-const { type } = require('os');
 
-//Hashing a string through SHA256
+//Hashing function, using SHA256
 function hash(string) {
   return createHash('sha256').update(string).digest('hex');
 }
 
-
+//Three functions do almost the same thing just for different labels
 function generateCampaignKey() {
   let campaign_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
   let campaign_string_hash = hash(campaign_initial_string);
@@ -208,7 +217,7 @@ function identifyKey(entered_key) {
 }
 
 function generateEmails(list, rel_campaign) {
-  for (i=0, email in list, i++) {
+  for (i=0; i < list.length; i++) {
       code = generateVoterKey();
       code_hashed = hash(code);
 
@@ -251,9 +260,9 @@ function createNewCampaign(name, candidates, voters, type, duration) {
     FOR candidate IN candidate array
       add candidate name to candidate_div
       add candidate_div to vote page
-	    add campaign_title to vote page
+      add campaign_title to vote page
     call generateEmails(voters, campaign_key)
-*/
+  */
   generateEmails(voters, campaign_key)
   return organiser_key;
 }
