@@ -13,3 +13,14 @@ CREATE TABLE active_campaigns (
     vote_page VARCHAR(50),
     organiser_page VARCHAR(50)
 );
+
+CREATE TABLE tally_table (
+    candidatename VARCHAR(50),
+    tally INT
+);
+
+CREATE TABLE raw_data (
+    candidates VARCHAR(50),
+)
+
+-- for each voter a new column with sequential id is added

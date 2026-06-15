@@ -9,43 +9,154 @@ if ("serviceWorker" in navigator) {
 
 //Series of functions crucial to background processing
 
-function prefVote(ID) {
-  var tally_table_version = 1;
+function prefVote() {
   results_array = [];
   var number_of_candidates = 0;
   preterm_winners = [];
   //for column in raw data table add 1 to num candidates and add a column with cand name to tally table
-
-  fetch(`/get_candidates?key${encodeURIComponent(ID)}`)
+  fetch(`/get_candidates`)
+  //Fetches data from server, parses response body into JSON obj
     .then(res => res.json())
+  //Receives parsed obj that can then be used
     .then(data => {
+    //Keeping all the cadidates as an array so I don't have to keep calling this fetch
+      const candidate_array = data;
       const num_of_candidates = data.length;
-      for (i=0; i < data.length; i++) {
+      for (i=0; i < num_of_candidates; i++) {
         let temp_cand = data[i];
-        fetch(`/add_candidate_column?tableID${encodeURIComponent(ID)}candname${temp_cand}`)
+        fetch(`/add_candidate_column?candname${encodeURIComponent(column_name)}`)
       }
     })
-
   while (number_of_candidates != 2) {
-    
-    //let total_votes = sum 
+    fetch(`/sumTotalVotestable`)
+    .then(res => res.json())
+    .then(data => {
+      let total_votes = data[0];
+    })
+    for (i=1; i < num_of_candidates; i++) {
+      let column_name = candidate_array[i];
+      fetch(`/number_of_ones?candname${encodeURIComponent(column_name)}`)
+      .then(res => res.json())
+      .then(data => {
+        let votes_for_cand = data[0]
+        fetch(`/add_ones_to_tally`)
+        total_votes += 1;
+      }) 
+    }
+    let half_votes = total_votes * 0.5;
+    fetch(`/sort_tally_desc`)
+    .then(res => res.json())
+    .then(data => {
+      //Access the numerical value of the most voted candidate
+      let first_running = data[0].tally;
+      let first_name = data[0].candidatename;
+    })
+    //Check if they got more than half of the votes
+    if (first_running >= half_votes) {
+      preterm_winners.push(first_name)
+      //Deleting the candidate from tables
+      fetch(`/delete_from_tally?candname${encodeURIComponent(first_name)}`)
+      fetch(`delete_from_raw_data?candname${encodeURIComponent(first_name)}`)
+      //Hence decreasing num of candidates 
+      number_of_candidates -= 1;
+    }
+    let tie_gate = [];
+    fetch(`/sort_tally_asc`)
+    .then(res => res.json())
+    .then(data => { 
+      let last_value = data[0].candidatename
+      //Starting from 1 so it doesn't count the last value
+      for (i=1; i < data.length; i++) {
+          if (data[i] == last_value) {
+            tie_gate.push(data[i].candidatename);
+          }
+      }
+      tie_gate.push(last_value);
+    })
+    let tie_gate_values = tie_gate.length;
+    if (tie_gate_values > 1) {
+      let rand_cand = tie_gate[Math.floor(Math.random() * tie_gate.length)];
+      let omit_cand = rand_cand
+    } else {
+      let omit_cand = tie_gate[0];
+    }
+    fetch(`/get_omit_prefs?omitcand${encodeURIComponent(omit_cand)}`)
+    .then (res => res.json())
+    .then(data => {
+      for (i=0; i < data.length; i++) {
+        let next_best = 2;
+        let success_second_pref = false
+        while (success_second_pref = false) {
+          for (i=0; i < data.length; i++) {
+            if (data[i] = next_best) {  
+              //Adding a tally to the name
+              fetch(`/add_ones_to_tally?candname${encodeURIComponent(data[i])}`)
+              success_second_pref = true;
+            } else {
+              next_best += 1
+            }
+          }
+        } 
+      }
+    })
+    results.push(omit_cand);
+    fetch(`/delete_from_tally$candname${encodeURIComponent(omit_cand)}`);
+    fetch(`/delete_from_raw_data$candname${encodeURIComponent(omit_cand)}`);
+    number_of_candidates -= 1
   }
-
-
-
+  fetch(`/get_rows`)
+  .then (res => res.json())
+  .then(data => {
+    let remainder_1 = data[0];
+    let remainder_2 = data[1];
+    if (remainder_1 = remainder_2) {
+      fetch("/sort_tally_asc")
+      .then (res => res.json())
+      .then(data => { 
+        results_array.push(data[1]);
+        results_array.push(data[0]);
+      })
+      if (preterm_winners) {
+        preterm_winners.reverse()
+        for (i=0; i < preterm_winners.length(); i++){
+          results_array.push(i);
+        }
+      }
+    } else {
+      fetch("/sort_tally_asc")
+      .then (res => res.json())
+      .then(data => { 
+        results_array.push(data[1] + "TIE");
+        results_array.push(data[0] + "TIE");
+      })
+      if (preterm_winners) {
+        preterm_winners.reverse()
+        for (i=0; i < preterm_winners.length(); i++){
+          results_array.push(i);
+        }
+      }
+    }
+  })
+  results_array.reverse()
+  return results_array
 }
 
-function majorityVote(ID) {
+function majorityVote() {
   tally_table = [];
   results_array = [];
-  for (var i = 0; i < tally_table.count; i++) {
-    if (row == 1) {
-      //tally_table(column name) += 1
-    }
-  }
-  //order columns ascending
-  // for column in id tally table
-      // add column name to results array, return results array
+  fetch(`/get_candidates`)
+  //Fetches data from server, parses response body into JSON obj
+    .then(res => res.json())
+  //Receives parsed obj that can then be used
+    .then(data => {
+    //Keeping all the cadidates as an array so I don't have to keep calling this fetch
+      const candidate_array = data;
+      const num_of_candidates = data.length;
+      for (i=0; i < num_of_candidates; i++) {
+        let temp_cand = data[i];
+        fetch(`/add_candidate_column?candname${encodeURIComponent(column_name)}`)
+      }
+    })
 }
 
 //Get a string of numbers close to "true random"
@@ -82,7 +193,7 @@ function generateOrganiserKey() {
 function identifyKey(entered_key) {
   let key_to_verify = entered_key;
   let entered_hash = hash(key_to_verify);
-  fetch(`/get_identity?key${encodeURIComponent(key_to_verify)}`)
+  fetch(`/get_identity?key${encodeURIComponent(entered_hash)}`)
     .then(res => res.json())
     .then(data => {
       const user_type = data.type;
@@ -212,6 +323,8 @@ const submitCampInfo = document.getElementById("create_campaign_submit");
 
 submitCampInfo.addEventListener('click', function() {
   //get event name, cand, emails, type, duration
+
+
   let eventName = ""
   let candidates = ""
   let emails = ""
@@ -273,160 +386,4 @@ ENDIF
 IF campaign(status) == pending AND campaign(duration) == 0:
 delete all relevant info wipe all data
 ENDIF
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Keeping past work below for reference
-
-/*
-//changing popup data to specific item clicked
-function appendData(obj_index) {
-  fetch(`/devices`)
-              .then(res => res.json())
-              .then(devices => {
-                const device = devices.find(d => d.obj_index === Number(obj_index));
-                const {image, device_name, year, brand, type, colour, description} = device;
-                //data obtained is added to the relevant popup text fields
-                  document.getElementById("rightpopup").innerHTML = `
-                    <h2 class="name">${device_name}</h2>
-                    <p class="brand">${brand}</p>
-                    <p class="year">${year}</p>
-                    <p class="type">${type}</p>
-                    <p class="colour">${colour}</p>
-                    <p class="about">${description}</p>
-                  `;
-                // image assigned to image div
-                  document.getElementById("leftpopup").innerHTML = `
-                    <img src="/${image}" alt="Device image">
-                  `;
-                });
-}
-
-const open_buttons = document.getElementsByClassName('object')
-for (let btn of open_buttons) {
-  //open popup on click
-  btn.addEventListener('click', function() {
-    //get the id of the clicked button
-    popup_func(this.id); 
-  }); 
-}
-
-// adding object data to popup and revealing it
-function popup_func(item_id) {
-  appendData(item_id);
-  //displays popup
-  document.getElementById('popup_win').style.visibility = 'visible'
-  // prevent page from scrolling
-  document.body.style.overflow = 'hidden';
-  //blur body of site
-  document.getElementById('blur_body').style.filter = 'blur(5px)' 
-}
-
-//close popup
-const close_btn = document.getElementById('popup_close');
-//on click close popup
-close_btn.addEventListener('click', close_popup_func);
-
-function close_popup_func() {
-  //hide popup
-  document.getElementById('popup_win').style.visibility = 'hidden' 
-  // allow scroll again
-  document.body.style.overflow = 'visible'; 
-  //unblur body
-  document.getElementById('blur_body').style.filter = 'blur(0px)' 
-}
-
-
-// need to add appendData() somewhere to append the data changes 
-const object_order_default = [1,2,3,4,5,6,7,8,9,10]; //dunno if relevant
-const device_objects = document.getElementsByClassName('object');
-
-// function hides all device objects and then unhides as per default array
-function reset_objects () {
-  for (var i = 0; i < device_objects.length; i++) {
-  device_objects[i].style.visibility = "hidden";
-  }
-  for (var i = 0; i < object_order_default.length; i++) {
-    device_objects[i].style.visibility = "visible";
-  }
-}
-
-// function to sort objects
-function sort_by (selected_option) {
-  //hide all the objects
-  for (var i = 0; i < device_objects.length; i++) {
-    device_objects[i].style.display = "none";
-  }
-
-  if (selected_option === "alphabetical") {
-  // fetch json
-    fetch("/sort_alphabet")
-    .then(response => response.json ())
-    .then(data => {
-      // access device object div
-      const container = document.querySelector(".device_objects");
-      data.forEach((obj) => {
-        // move each object to the end of div to sort
-        const dev = document.getElementById(obj.obj_index);
-        container.appendChild(dev);
-        dev.style.display="block";
-      });
-    })
-  // same process for other sorting options
-  } else if (selected_option === "reverse") {
-    fetch("/sort_rev_alphabet")
-    .then(response => response.json ())
-    .then(data => {
-      const container=document.querySelector(".device_objects");
-      data.forEach((obj) => {
-        const dev = document.getElementById(obj.obj_index);
-        container.appendChild(dev);
-        dev.style.display="block";
-      });
-    })
-  } else if (selected_option === "increase") {
-    fetch("/sort_year")
-    .then(response => response.json ())
-    .then(data => {
-      const container=document.querySelector(".device_objects");
-      data.forEach((obj) => {
-        const dev = document.getElementById(obj.obj_index);
-        container.appendChild(dev);
-        dev.style.display="block";
-      });
-    })
-  } else if (selected_option === "decrease") {
-    fetch("/sort_rev_year")
-    .then(response => response.json ())
-    .then(data => {
-      const container=document.querySelector(".device_objects");
-      data.forEach((obj) => {
-        const dev = document.getElementById(obj.obj_index);
-        dev.style.display="block";
-        container.appendChild(dev);
-      });
-    })
-  };
-}
-
-// Listening for sort button to change 
-document.getElementById("sort_popup").addEventListener("change", function() {
-  // get the sort type
-  const selectedId = this.options[this.selectedIndex].id;
-  // call relevant sort
-  sort_by(selectedId);
-});
-
 */

@@ -7,6 +7,7 @@ const app = express();
 
 //SQL functions
 
+//Function to return the identity of a code
 function getIdentity(key, callback) {
   db.get("SELECT * FROM key_table WHERE code = ?", [key], (err, rows) => {
     if (err) {
@@ -28,10 +29,9 @@ app.get("/get_identity", (req, res) => {
 
 
 
-
 // Querying to count candidates
 function getCandidates(callback) {
-  db.all("SELECT candidates FROM raw_data_table?;", [tableID], (err, rows) => {
+  db.all("SELECT candidates FROM raw_data_table", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -42,19 +42,16 @@ function getCandidates(callback) {
 };
 
 app.get("/get_candidates", (req, res) => {
-  let tableID = req.query.tableID;
-
-  getCandidates(tableID, (rows) => {
+  getCandidates((rows) => {
     res.json(rows);
   });
 });
 
 
 
-
 //Adding a column?
-function addColumn(table, name, callback) {
-  db.run("ALTER TABLE ? ADD COLUMN ? VARCHAR(50)", [tableID, candname])
+function addColumn(candname, callback) {
+  db.run("ALTER TABLE tally_table ADD COLUMN ? VARCHAR(50)", [candname])
     if (err) {
           if (err.message.includes("duplicate column name")) {
               console.log("Column already exists.");
@@ -67,14 +64,15 @@ function addColumn(table, name, callback) {
 }
 
 app.post("/add_candidate_column", (req, res) => {
-  let tableID = req.query.tableID;
   let candname = req.query.candname;
-  addColumn(tableID, candname(rows))
+  addColumn(candname)
 })
 
 
-function sumTotalVotes(ID, callback) {
-  db.get("SELECT SUM (votes) FROM tally_table?", [tableID], (err, rows) => {
+
+//adding together the overall votes
+function sumTotalVotes(callback) {
+  db.get("SELECT SUM (votes) FROM tally_table", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -84,13 +82,17 @@ function sumTotalVotes(ID, callback) {
   })
 }
 
+app.get("/sumTotalVotes", (req, res) => {
+  sumTotalVotes((rows) => {
+    res.json(rows);
+  });
+});
 
 
 
-/*
-// Querying to get all objects
-function getDevices(callback) {
-  db.all("SELECT * FROM site_objects;", (err, rows) => {
+//Getting the number of first preferences
+function getRow(candname, callback) {
+  db.get("SELECT COUNT(?) FROM raw_results_table WHERE ? = 1", [candname], (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -98,12 +100,30 @@ function getDevices(callback) {
     }
     callback(rows);
   })
-};
+}
 
-// Querying to get sorted objects
-// alphabetical
-function sortAlphabet(callback) {
-  db.all("SELECT * FROM site_objects ORDER BY LOWER(device_name) COLLATE NOCASE ASC;", (err, rows) => {
+app.get("/number_of_ones", (req, res) => {
+  let candname = req.query.candname;
+  getRow(candname, (rows) => {
+    res.json(rows);
+  });
+});
+
+
+//Adding tallies for candidates
+function addToTallyTable(candname, callback) {
+  db.run("UPDATE tally_table SET tally = tally + 1 WHERE name = ?", [candname])
+}
+
+app.post("/add_ones_to_tally", (req, res) => {
+  let candname = req.query.candname;
+  addToTallyTable(candname)
+})
+
+
+//Sorting descending
+function sortDescending(callback) {
+  db.all("SELECT * FROM tally_table ORDER BY tally DESC", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -111,11 +131,17 @@ function sortAlphabet(callback) {
     }
     callback(rows);
   })
-};
+}
 
-// reverse alphabetical
-function sortRevAlphabet(callback) {
-  db.all("SELECT * FROM site_objects ORDER BY LOWER(device_name) COLLATE NOCASE DESC;", (err, rows) => {
+app.get("/sort_tally_desc", (req, res) => {
+  sortDescending((rows) => {
+    res.json(rows);
+  });
+})
+
+//Sorting ascending
+function sortAscending(callback) {
+  db.all("SELECT * FROM tally_table ORDER BY tally ASC", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -123,11 +149,40 @@ function sortRevAlphabet(callback) {
     }
     callback(rows);
   })
-};
+}
 
-// ascending year
-function sortYear(callback) {
-  db.all("SELECT * FROM site_objects ORDER BY year;", (err, rows) => {
+app.get("/sort_tally_asc", (req, res) => {
+  sortAscending((rows) => {
+    res.json(rows);
+  });
+})
+
+
+//Remove row from tally table
+function deleteFromTallyTable(candname, callback) {
+  db.run("DELETE FROM tally_table WHERE candidatename = ?", [candname])
+}
+
+app.post("/delete_from_tally", (req, res) => {
+  let candname = req.query.candname;
+  deleteFromTallyTable(candname)
+})
+
+
+//Remove row from raw data table
+function deleteFromRawData(candname, callback) {
+  db.run("DELETE FROM raw_data WHERE candidates = ?", [candname])
+}
+
+app.post("/delete_from_raw_data", (req, res) => {
+  let candname = req.query.candname;
+  deleteFromRawData(candname)
+})
+
+
+//Get rows of omitted candidate
+function getOmitPreferences(omitcand, callback) {
+  db.get("SELECT * FROM raw_data WHERE candidates = ?", [omitcand], (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
@@ -135,57 +190,35 @@ function sortYear(callback) {
     }
     callback(rows);
   })
-};
+}
 
-// descending year
-function sortRevYear(callback) {
-  db.all("SELECT * FROM site_objects ORDER BY year DESC;", (err, rows) => {
+app.get("/get_omit_prefs", (req, res) => {
+  let omitcand = req.query.omitcand;
+  getOmitPreferences(omitcand, (rows) => {
+    res.json(rows);
+  });
+});
+
+
+//Select all rows for final comparison
+function getRows(callback) {
+  db.all{"SELECET *", (err, rows) => {
     if (err) {
       console.error(err);
       callback([]);
       return;
-    }
+    };
     callback(rows);
-  })
+  }};
 };
 
-
-// Retrieving JSON from query functions
-// Get sorted objects
-
-app.get("/sort_alphabet", (req, res) => {
-  sortAlphabet((rows) => {
-    res.json(rows);
-  });
-});
-
-app.get("/sort_rev_alphabet", (req, res) => {
-  sortRevAlphabet((rows) => {
-    res.json(rows);
-  });
-});
-
-app.get("/sort_year", (req, res) => {
-  sortYear((rows) => {
-    res.json(rows);
-  });
-});
-
-app.get("/sort_rev_year", (req, res) => {
-  sortRevYear((rows) => {
-    res.json(rows);
-  });
-});
-
-// Get all objects
-app.get("/devices", (req, res) => {
-  getDevices((rows) => {
+app.get("/get_rows", (req, res) => {
+  getRows((rows) => {
     res.json(rows);
   });
 });
 
 
-*/
 
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(8000, () =>  {console.log("Server is running on Port 8000, visit http://localhost:8000/ or http://127.0.0.1:8000 to access your website");} );
