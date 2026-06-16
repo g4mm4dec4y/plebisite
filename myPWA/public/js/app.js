@@ -318,24 +318,19 @@ function validateCampaignInfo(name, cands, email_doc, type) {
 function getPageForOrganiser(key) {
   let ref = hash(key);
 
+  fetch(`/camp_status?key${encodeURIComponent(key)}`)
+  .then(res => res.json())
+  .then(data => {
+    if (data == "in_progress") {
 
-  /*
-    IF campaign(ref)_status == in_progress;
-	    clear organiser_page(ref)
-		  add waiting_room div
-    ELSEIF campaign(ref)_status == finished;
-	    clear organiser_page(ref)
-		  get campaign(results_array)
-			  FOR item IN results_array
-				  add name to candidate_div
-				  add preference to candidate_div
-				  add div to organiser_page(ref)
-	  ELSE
-		  clear organiser_page
-		  show error_div
-	  ENDIF
-
-  */
+    } else if (data == "finished") {
+      fetch //results array
+      //for item in arrat add name to cand dive, add pref, add div to org page
+    } else {
+      //clear org page
+      //show error div
+    }
+  })
 }
 
 function getCampaignForUser(key) {
@@ -349,7 +344,6 @@ function getCampaignForUser(key) {
 
 results_array = [];
 
-
 const submitCampInfo = document.getElementById("create_campaign_submit");
 
 submitCampInfo.addEventListener('click', function() {
@@ -362,9 +356,22 @@ submitCampInfo.addEventListener('click', function() {
   let duration = document.getElementById("end_date").valueAsNumber;
   status = validateCampaignInfo(event_name, candidates, emails, type, duration)
   if (status == "clear") {
-    createNewCampaign(event_name, candidates, emails, type, duration)
-    //redirect to success page and return organiser code
-    //change the.. organiser page? to.. waiting room?
+    org_code = createNewCampaign(event_name, candidates, emails, type, duration)
+    //redirect organiser
+    window.location.replace("/early_view.html")
+    //add popup to the page to show organiser their code
+    let organiser_code_popup = document.getElementById("organiser_popup")
+    
+    //clear the text in the popup
+    organiser_code_popup.textContent = ""
+    organiser_code_popup.textContent = "Use this code to access your results: " + org_code
+    organiser_code_popup.style.visibility = 'visible'
+    
+    let organiser_popup_close = document.getElementById("organiser_popup_close")
+    organiser_popup_close.addEventListener('click', function() {
+      organiser_code_popup.style.visibility = 'hidden'
+      organiser_code_popup.replaceChildren()
+    })
   } else {
     alert(status)
   }
@@ -387,14 +394,25 @@ codeEnter.addEventListener('click', function() {
 const voteEnter = document.getElementById("vote_submit");
 
 voteEnter.addEventListener('click', function() {
-  // for candidate dive add value to candidate in raw results table
+
+  // for candidate div add value to candidate in raw results table
   //for (i=0, , i++,) {
   //  a='g';
   //}
-  // redirect home
-  // display thanks for voting popup
+  window.location.replace("/thankyou.html")
   // delete user key instances in keys table
 });
+
+
+//Checking the status of a campaign consistently
+function checkStatus() {
+  fetch(`/camp_status?camp_key${encodeURIComponent(key)}`)
+}
+
+let intervalID = setInterval(checkStatus(), 100);
+clearInterval(intervalID);
+
+
 
 
 /*

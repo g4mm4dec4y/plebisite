@@ -252,8 +252,58 @@ app.post("/insert_campaign_details", (req, res) => {
 
 
 //Getting status of a campaign
+function getCampStatus(camp_key, callback) {
+  db.get("SELECT camp_status FROM active_campaigns WHERE camp_key = ?", [camp_key], (err, rows) => {
+    if (err) {
+      console.error(err);
+      callback([]);
+      return;
+    };
+    callback(rows);
+  })
+}
+
+app.get("/camp_status", (req, res) => {
+  let camp_key = req.query.camp_key;
+  getCampStatus(camp_key, (rows) => {
+    res.json(rows);
+  });
+})
+
+//Getting the vote page for a campaign
+function getVotePage(key, callback) {
+  db.run("SELECT vote_page FROM active_campaigns WHERE camp_key = ?", [camp_key], (err, rows) => {
+    if (err) {
+      console.error(err);
+      callback([]);
+      return;
+    };
+    callback(rows);
+  })
+}
+
+app.get("/camp_vote_page", (req, res) => {
+  let camp_key = req.query.camp_key;
+  getVotePage(camp_key, (rows) => {
+    res.json(rows);
+  });
+})
 
 
+//Deleting all user key instances
+function deleteUserKeyInstances(user_key, callback) {
+  db.run("", [user_key])
+}
+
+app.post("/insert_campaign_details", (req, res) => {
+  let user_key = req.query.user_key;
+  deleteUserKeyInstances(code)
+});
+
+//Deleting all campaign instances
+
+
+//Getting
 
 
 app.use(express.static(path.join(__dirname, "public")));
