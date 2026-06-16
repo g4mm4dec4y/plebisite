@@ -222,6 +222,39 @@ app.get("/get_rows", (req, res) => {
 });
 
 
+//Inserting key details into table
+function insertKeyInfo(code, type, campaign, callback) {
+  db.run("INSERT INTO key_table (?, ?, ?)", [code, type, campaign])
+}
+
+app.post("/insert_key_info", (req, res) => {
+  let code = req.query.code;
+  let code_type = req.query.code_type;
+  let campaign = req.query.campaign
+  insertKeyInfo(code, type, campaign)
+});
+
+//Inserting campaign details into table
+function insertCampDetails(camp_key, camp_status, duration, selected_process, vote_page, organiser_page, callback) {
+  db.run("INSERT INTO active_campaigns (?, ?, ?, ?, ?, ?, ?)", [camp_key, camp_status, duration, selected_process, vote_page, organiser_page])
+}
+
+app.post("/insert_campaign_details", (req, res) => {
+  let camp_key = req.query.camp_key;
+  let camp_status = req.query.status;
+  let duration = req.query.duration;
+  let selected_process = req.query.selected_process;
+  let vote_page = req.query.vote_page;
+  let organiser_page = req.query.organiser_page;
+  insertCampDetails(code, type, campaign)
+});
+
+
+
+//Getting status of a campaign
+
+
+
 
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(8000, () =>  {console.log("Server is running on Port 8000, visit http://localhost:8000/ or http://127.0.0.1:8000 to access your website");} );

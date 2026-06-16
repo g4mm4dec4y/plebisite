@@ -100,8 +100,8 @@ function prefVote() {
       }
     })
     results.push(omit_cand);
-    fetch(`/delete_from_tally$candname${encodeURIComponent(omit_cand)}`);
-    fetch(`/delete_from_raw_data$candname${encodeURIComponent(omit_cand)}`);
+    fetch(`/delete_from_tally?candname${encodeURIComponent(omit_cand)}`);
+    fetch(`/delete_from_raw_data?candname${encodeURIComponent(omit_cand)}`);
     number_of_candidates -= 1
   }
   fetch(`/get_rows`)
@@ -182,6 +182,7 @@ function hash(string) {
 }
 
 //Three functions do almost the same thing just for different labels
+//The random integer would be 24 characters this way
 function generateCampaignKey() {
   let campaign_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
   let campaign_string_hash = hash(campaign_initial_string);
@@ -220,10 +221,10 @@ function generateEmails(list, rel_campaign) {
   for (i=0; i < list.length; i++) {
       code = generateVoterKey();
       code_hashed = hash(code);
-
-      // send email to email with link and code
-      // add code_hashed, type=voter, campaign=rel_campaign to key table
-
+      //Not actually emailing, unfortunately.
+      //'i' would be an email
+      //Key gets added though, can be used for demo
+      fetch(`/insert_key_info?code${encodeURIComponent(code_hashed)}type${encodeURIComponent("voter")}campaign${encodeURIComponent(rel_campaign)}`)
   }
 }
 
@@ -231,14 +232,19 @@ function validateEmails(document) {
   let invalid_emails = [];
   let valid_emails = [];
 
-
-  while (line in document) {
-    //email = remove whitespace of line
-    //if email matches email regex
-    // add email to valid emails
-    //else add email to invalid emails
-  };
-
+  //Separating document into lines assuming new email each line as instructed
+  let lines = document.split(/[\r\n]+/g);
+  for (i = 0; i < lines.length; i++) {
+    //Removing whitespace
+    let proper_string = i.replace(/\s+/g, '')
+    //Very simple email regex, more complex systems are recommended though
+    let email_regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+    if (proper_string.test(email_regex)) {
+      valid_emails.push(proper_string);
+    } else {
+      invalid_emails.push(proper_string);
+    }
+  }
 
   if (invalid_emails) {
     alert("There is an issue with your emails. No campign has been initiated. Please refer to the troubleshooting page and try again.");
@@ -248,21 +254,34 @@ function validateEmails(document) {
   };
 }
 
-function createNewCampaign(name, candidates, voters, type, duration) {
+function createNewCampaign(name, candidates, voters, process, type, duration) {
   let campaign_key = generateCampaignKey();
   let camp_page = hash(campaign_key);
   let organiser_key = generateOrganiserKey();
   let organiser_key_hashed = hash(organiser_key);
-  // add to key table organiser_key_hashed, type=organiser, campaign=campaign_key
-  // add to active_campaigns database name, duration, camp_page=vote page
+  fetch(`/insert_key_info?code${encodeURIComponent(organiser_key_hashed)}code_type${encodeURIComponent("organiser")}campaign${encodeURIComponent(campaign_key)}`)
+  fetch(`/insert_campaign_details?camp_key${encodeURIComponent(campaign_key)}camp_status${encodeURIComponent("active")}duration${encodeURIComponent(duration)}selected_process${encodeURIComponent(process)}vote_page${encodeURIComponent(camp_page)}`)
+  
+
+  // Source - https://stackoverflow.com/a/46545530
+  // Posted by superluminary, modified by community. See post 'Timeline' for change history
+  // Retrieved 2026-06-16, License - CC BY-SA 4.0
+  //Relatively simple shuffle method just to prevent candidates appearing the same
+  //Prevent unserious voters going "1,2,3,4 etc" for everyone 
+  let unshuffled_cand_array = candidates
+
   //randomise candidate array
-  /*
-    FOR candidate IN candidate array
-      add candidate name to candidate_div
-      add candidate_div to vote page
-      add campaign_title to vote page
-    call generateEmails(voters, campaign_key)
-  */
+  let shuffled_cand_array = unshuffled_cand_array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+    
+  for (i=0; i < shuffled_cand_array.length; i++) {
+    //add cand name to candidate div
+    //add cand div to vote page
+    //add title to vote page
+  }
+
   generateEmails(voters, campaign_key)
   return organiser_key;
 }
@@ -298,6 +317,8 @@ function validateCampaignInfo(name, cands, email_doc, type) {
 
 function getPageForOrganiser(key) {
   let ref = hash(key);
+
+
   /*
     IF campaign(ref)_status == in_progress;
 	    clear organiser_page(ref)
@@ -319,6 +340,7 @@ function getPageForOrganiser(key) {
 
 function getCampaignForUser(key) {
     let ref = hash(key);
+
     //let campaign = ref row active_campaign(vote page) cell
     //redirect user to vote page (link/campaign)
 }
@@ -331,17 +353,16 @@ results_array = [];
 const submitCampInfo = document.getElementById("create_campaign_submit");
 
 submitCampInfo.addEventListener('click', function() {
-  //get event name, cand, emails, type, duration
-
-
-  let eventName = ""
-  let candidates = ""
-  let emails = ""
-  let type = ""
-  let duration = ""
-  status = validateCampaignInfo(eventName, candidates, emails, type, duration)
+  let event_name = document.getElementById("campaign_name").textContent;
+  let candidates = document.getElementByClass("candidate_name_input");
+  //let emails = document
+  //Checking the value of the radio button that was selected
+  let type = document.querySelector('input[name="votesys"]:checked').value;
+  //Value as number returns time in Unix milliseconds allowing for duration calculation
+  let duration = document.getElementById("end_date").valueAsNumber;
+  status = validateCampaignInfo(event_name, candidates, emails, type, duration)
   if (status == "clear") {
-    createNewCampaign(eventName, candidates, emails, type, duration)
+    createNewCampaign(event_name, candidates, emails, type, duration)
     //redirect to success page and return organiser code
     //change the.. organiser page? to.. waiting room?
   } else {
@@ -352,8 +373,7 @@ submitCampInfo.addEventListener('click', function() {
 const codeEnter = document.getElementById("code_enter");
 
 codeEnter.addEventListener('click', function() {
-  //get field input
-  let code = "";
+  let code = document.getElementById("code_field").textContent;
   let user_check = identifyKey(code);
   if (user_check == "voter") {
     getCampaignForUser();

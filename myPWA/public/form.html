@@ -42,7 +42,7 @@
                     <div class="candidate_input">
                         <p>Enter the name of each candidate: </p>
                         <p>This can be the first name, full name, nickname, whatever is most necessary!</p>
-                        <input type="text">
+                        <input type="text" class="candidate_name_input">
                         <input type="image" id="add_candidate" src="images/plus.png">
                     </div>
 
@@ -59,11 +59,12 @@
                     <div class="votesys_input">
                         <p>Select a voting system:</p>
                         <p>Preferential voting is highly recommended</p>
-                        <input type="radio" id="pref_vote">
+                        <input type="radio" id="pref_vote" name="votesys" value="pref_vote">
                         <label for="pref_vote">Preferential</label>
-                        <input type="radio" id="majority_vote">
+                        <input type="radio" id="majority_vote" name="votesys" value="majority_vote">
                         <label for="majority_vote">Majority</label>
                     </div>
+                    <br>
                     <button class="button" id="create_campaign_submit">Create</button>
                 </div>
         </main>
