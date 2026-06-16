@@ -292,18 +292,35 @@ app.get("/camp_vote_page", (req, res) => {
 
 //Deleting all user key instances
 function deleteUserKeyInstances(user_key, callback) {
+  db.run("DELETE FROM key_table WHERE ", [user_key])
+}
+
+app.post("/delete_user_instances", (req, res) => {
+  let user_key = req.query.user_key;
+  deleteUserKeyInstances(user_key)
+});
+
+//Deleting all campaign instances from key_table
+function deleteCampaignInstances(user_key, callback) {
   db.run("", [user_key])
 }
 
-app.post("/insert_campaign_details", (req, res) => {
+app.post("/delete_campaign_instances", (req, res) => {
   let user_key = req.query.user_key;
-  deleteUserKeyInstances(code)
+  deleteCampaignInstances(user_key)
 });
 
-//Deleting all campaign instances
 
+//Deleting all campaign instances from active_campaigns table
+function deleteCampaignInstances(user_key, callback) {
+  db.run("", [user_key])
+}
 
-//Getting
+app.post("/delete_campaign_instances", (req, res) => {
+  let user_key = req.query.user_key;
+  deleteCampaignInstances(user_key)
+});
+
 
 
 app.use(express.static(path.join(__dirname, "public")));
