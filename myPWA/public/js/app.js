@@ -9,6 +9,7 @@ if ("serviceWorker" in navigator) {
 
 //Series of functions crucial to background processing
 
+//Function to process votes preferentially and return results
 function prefVote() {
   results_array = [];
   var number_of_candidates = 0;
@@ -141,6 +142,7 @@ function prefVote() {
   return results_array
 }
 
+//Processing votes based on who gets the most "1" preferences
 function majorityVote() {
   tally_table = [];
   results_array = [];
@@ -175,31 +177,30 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
-
 //Hashing function, using SHA256
 function hash(string) {
   return createHash('sha256').update(string).digest('hex');
 }
 
 //Three functions do almost the same thing just for different labels
-//The random integer would be 24 characters this way
+//The random integer would be 24 characters this way 
+//Probably not the best way to do this though
 function generateCampaignKey() {
   let campaign_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
   let campaign_string_hash = hash(campaign_initial_string);
   return campaign_string_hash;
 }
-
 function generateVoterKey() {
   let voter_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
   let voter_string_hash = hash(campaign_initial_string);
   return voter_string_hash;
 }
-
 function generateOrganiserKey() {
   let organiser_initial_string = getRndInteger(100000000000000000000000, 999999999999999999999999);
   return organiser_initial_string;
 }
 
+//Identifies what kind of key is submitted by a user (organiser or voter)
 function identifyKey(entered_key) {
   let key_to_verify = entered_key;
   let entered_hash = hash(key_to_verify);
@@ -217,6 +218,7 @@ function identifyKey(entered_key) {
     };
 }
 
+//Sending voters their codes to access the campaign
 function generateEmails(list, rel_campaign) {
   for (i=0; i < list.length; i++) {
       code = generateVoterKey();
@@ -228,10 +230,10 @@ function generateEmails(list, rel_campaign) {
   }
 }
 
+//Separate function to validate the emails provided by an organiser
 function validateEmails(document) {
   let invalid_emails = [];
   let valid_emails = [];
-
   //Separating document into lines assuming new email each line as instructed
   let lines = document.split(/[\r\n]+/g);
   for (i = 0; i < lines.length; i++) {
@@ -245,7 +247,7 @@ function validateEmails(document) {
       invalid_emails.push(proper_string);
     }
   }
-
+//If there is no issue, all valid emails (which should be all of them) are returned to be used
   if (invalid_emails) {
     alert("There is an issue with your emails. No campign has been initiated. Please refer to the troubleshooting page and try again.");
     return false;
@@ -254,6 +256,10 @@ function validateEmails(document) {
   };
 }
 
+//Creation of a new campaign
+//Only occurs once program checks if information is valid
+//Adds information to tables 
+//This information is later fetched and utilised for various purposes
 function createNewCampaign(name, candidates, voters, process, type, duration) {
   let campaign_key = generateCampaignKey();
   let camp_page = hash(campaign_key);
@@ -261,15 +267,12 @@ function createNewCampaign(name, candidates, voters, process, type, duration) {
   let organiser_key_hashed = hash(organiser_key);
   fetch(`/insert_key_info?code${encodeURIComponent(organiser_key_hashed)}code_type${encodeURIComponent("organiser")}campaign${encodeURIComponent(campaign_key)}`)
   fetch(`/insert_campaign_details?camp_key${encodeURIComponent(campaign_key)}camp_status${encodeURIComponent("active")}duration${encodeURIComponent(duration)}selected_process${encodeURIComponent(process)}vote_page${encodeURIComponent(camp_page)}`)
-  
-
   // Source - https://stackoverflow.com/a/46545530
   // Posted by superluminary, modified by community. See post 'Timeline' for change history
   // Retrieved 2026-06-16, License - CC BY-SA 4.0
   //Relatively simple shuffle method just to prevent candidates appearing the same
   //Prevent unserious voters going "1,2,3,4 etc" for everyone 
   let unshuffled_cand_array = candidates
-
   //randomise candidate array
   let shuffled_cand_array = unshuffled_cand_array
       .map(value => ({ value, sort: Math.random() }))
@@ -281,11 +284,15 @@ function createNewCampaign(name, candidates, voters, process, type, duration) {
     //add cand div to vote page
     //add title to vote page
   }
-
+  //Sending out emails (which at the moment is not implemented)
   generateEmails(voters, campaign_key)
+  //The organiser key is returned from the func to then be displayed to the organiser
   return organiser_key;
 }
 
+//Checks the information an organiser had provided about a campaign
+//If there is an issue, the campaign won't be made
+//The issue is returned to the organiser
 function validateCampaignInfo(name, cands, email_doc, type) {
   let error_info = "";
   let validity_status = false;
@@ -307,7 +314,6 @@ function validateCampaignInfo(name, cands, email_doc, type) {
       validity_status = false;
     };
   }
-
   if (validity_status == false) {
     return error_info;
   } else {
@@ -315,37 +321,42 @@ function validateCampaignInfo(name, cands, email_doc, type) {
   }
 }
 
+//Obtaining the page for an organiser that wants to check in on their campaign
 function getPageForOrganiser(key) {
   let ref = hash(key);
-
+  //Obtain the status of the campaign
   fetch(`/camp_status?key${encodeURIComponent(key)}`)
   .then(res => res.json())
   .then(data => {
     if (data == "in_progress") {
-
+      //If campaign is active, it displays a "waiting room" page
     } else if (data == "finished") {
+      //If campaign is finished, the page shows results
       fetch //results array
-      //for item in arrat add name to cand dive, add pref, add div to org page
+      //for item in array add name to cand dive, add pref, add div to org page
     } else {
-      //clear org page
+      //clear organiser page
       //show error div
     }
   })
 }
 
+//Obtaining the page for a user that entered their key
 function getCampaignForUser(key) {
     let ref = hash(key);
-
     //let campaign = ref row active_campaign(vote page) cell
     //redirect user to vote page (link/campaign)
 }
 
+
 //General page algorithm
 
+//Fresh result array
 results_array = [];
 
 const submitCampInfo = document.getElementById("create_campaign_submit");
 
+//Listen for when an organiser submits information for a new campaign
 submitCampInfo.addEventListener('click', function() {
   let event_name = document.getElementById("campaign_name").textContent;
   let candidates = document.getElementByClass("candidate_name_input");
@@ -353,24 +364,24 @@ submitCampInfo.addEventListener('click', function() {
   //Checking the value of the radio button that was selected
   let type = document.querySelector('input[name="votesys"]:checked').value;
   //Value as number returns time in Unix milliseconds allowing for duration calculation
+  //The duration is used later on to monitor the status of campaigns
   let duration = document.getElementById("end_date").valueAsNumber;
   status = validateCampaignInfo(event_name, candidates, emails, type, duration)
   if (status == "clear") {
     org_code = createNewCampaign(event_name, candidates, emails, type, duration)
-    //redirect organiser
+    //redirect organiser to their respective page
+    //It will immediately show a "waiting room" page as the campaign would not have ended yet
     window.location.replace("/early_view.html")
     //add popup to the page to show organiser their code
     let organiser_code_popup = document.getElementById("organiser_popup")
-    
     //clear the text in the popup
     organiser_code_popup.textContent = ""
     organiser_code_popup.textContent = "Use this code to access your results: " + org_code
     organiser_code_popup.style.visibility = 'visible'
-    
+    //Listen for when the user clicks to close the popup
     let organiser_popup_close = document.getElementById("organiser_popup_close")
     organiser_popup_close.addEventListener('click', function() {
       organiser_code_popup.style.visibility = 'hidden'
-      organiser_code_popup.replaceChildren()
     })
   } else {
     alert(status)
@@ -392,29 +403,23 @@ codeEnter.addEventListener('click', function() {
 });
 
 const voteEnter = document.getElementById("vote_submit");
-
+//Listen for when the vote submit button is clicked
 voteEnter.addEventListener('click', function() {
-
   // for candidate div add value to candidate in raw results table
   //for (i=0, , i++,) {
   //  a='g';
   //}
+  //Redirect voter to the "thank you" page
   window.location.replace("/thankyou.html")
   // delete user key instances in keys table
 });
-
 
 //Checking the status of a campaign consistently
 function checkStatus() {
   fetch(`/camp_status?camp_key${encodeURIComponent(key)}`)
 }
-
 let intervalID = setInterval(checkStatus(), 100);
 clearInterval(intervalID);
-
-
-
-
 /*
 IF campaign(status) == active AND campaign(duration) == 0
 IF selected_process of ID column in active_campaigns == "pref"
@@ -429,7 +434,6 @@ ENDIF
 campaign(status) == pending 
 campaign(duration) == 48h
 ENDIF
-
 IF campaign(status) == pending AND campaign(duration) == 0:
 delete all relevant info wipe all data
 ENDIF
