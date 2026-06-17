@@ -21,6 +21,6 @@ CREATE TABLE tally_table (
 
 CREATE TABLE raw_data (
     candidates VARCHAR(50),
-)
+);
 
 -- for each voter a new column with sequential id is added
